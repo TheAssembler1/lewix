@@ -4,7 +4,7 @@ set -u
 set -e
 
 : << 'END_COMMENT'
-echo "extracting, building and installing cross binutils"
+echo "extracting, building, and installing cross binutils"
 (
   cd $LEWIX_MNT_ROOT_SRC_DIR
   tar -xf binutils-2.42.tar.xz
@@ -25,7 +25,7 @@ echo "extracting, building and installing cross binutils"
 END_COMMENT
 
 : << 'END_COMMENT'
-echo "extracting, building and installing cross gcc"
+echo "extracting, building, and installing cross gcc"
 (
   cd $LEWIX_MNT_ROOT_SRC_DIR
   tar -xf gcc-13.2.0.tar.xz
@@ -78,25 +78,31 @@ echo "extracting, building and installing cross gcc"
 )
 END_COMMENT
 
-# FIXME: 5.4. Linux-6.4.12 API Headers install
 : << 'END_COMMENT'
-echo "extracting, building and installing cross binutils"
+echo "extracting, building, and installing glibc"
 (
   cd $LEWIX_MNT_ROOT_SRC_DIR
-  tar -xf binutils-2.42.tar.xz
+  tar -xf linux-6.7.4.tar.xz
+  cd linux-6.7.4
 
-  cd binutils-2.42
-  mkdir -vp build
-
-  cd build
-  ../configure --prefix=$LEWIX_MNT_ROOT_TOOLS_DIR \
-    --with-sysroot=$LEWIX_MNT_DIR \
-    --target=$LEWIX_TGT \
-    --disable-nls \
-    --enable-gprofng=no \
-    --disable-werror
-  make -j$(nproc)
-  make install
+  make mrproper
+  make headers
+  find usr/include -type f ! -name '*.h' -delete
+  cp -rv usr/include $LEWIX_MNT_ROOT_DIR/usr
 )
 END_COMMENT
 
+# FIXME: build glibc
+: << 'END_COMMENT'
+echo "extracting and copying Linux API headers"
+(
+  cd $LEWIX_MNT_ROOT_SRC_DIR
+  tar -xf linux-6.7.4.tar.xz
+  cd linux-6.7.4
+
+  make mrproper
+  make headers
+  find usr/include -type f ! -name '*.h' -delete
+  cp -rv usr/include $LEWIX_MNT_ROOT_DIR/usr
+)
+END_COMMENT
