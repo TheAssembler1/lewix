@@ -3,11 +3,8 @@
 set -u
 set -e
 
-SRC_DIR=/mnt/lewix/root/src
-
-mkdir -pv $SRC_DIR || true
-chmod -v a+wt $SRC_DIR
-chown root:root $SRC_DIR
+mkdir -pv $LEWIX_MNT_ROOT_SRC_DIR || true
+chmod -v a+wt $LEWIX_MNT_ROOT_SRC_DIR
 
 PACKAGES_URL=(
   "https://download.savannah.gnu.org/releases/acl/acl-2.3.2.tar.xz"
@@ -114,7 +111,7 @@ download_file() {
     # shellcheck disable=SC2155
     local FILENAME=$(basename "$URL")
     echo "Downloading $FILENAME..."
-    wget -q --show-progress "$URL" -P "$SRC_DIR" 2>&1 | tee -a "logs/$FILENAME-download.log"
+    wget -q --show-progress "$URL" -P "$LEWIX_MNT_ROOT_SRC_DIR" 2>&1 | tee -a "logs/$FILENAME-download.log"
 
     if [ $? -eq 0 ]; then
         echo "$FILENAME downloaded."
@@ -140,6 +137,3 @@ done
 echo "waiting for patches to install"
 wait
 echo "done installing patches"
-
-echo "cleaning up tmp files"
-sudo rm -v "$SRC_DIR/*.tar.xz.*" "$SRC_DIR/*.tar.gz.*" "$SRC_DIR/*.tar.bz2.*"
